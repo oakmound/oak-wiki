@@ -8,6 +8,8 @@ jobs:
       - uses: actions/checkout@master
       - name: Clone
         run: |
+          git config --global user.email "robots@oakmound.com"
+          git config --global user.name "Oak Bot"
           git clone https://github.com/oakmound/oak.wiki.git
           cp ./*.md oak.wiki/
           cd oak.wiki

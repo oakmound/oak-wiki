@@ -1,0 +1,16 @@
+name: Clone
+on: [push]
+jobs:
+  master:
+    name: Clone to Oak
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Clone
+        run: |
+          git clone https://github.com/oakmound/oak.wiki.git
+          cp ./*.md oak.wiki/
+          cd oak.wiki
+          git add *
+          git commit -m "Push from Github Actions"
+          git push 

@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Clone
+      - name: Update
         run: |
           git config --global user.email "robots@oakmound.com"
           git config --global user.name "Oak Bot"
@@ -15,4 +15,9 @@ jobs:
           cd oak.wiki
           git add *
           git commit -m "Push from Github Actions"
-          git push 
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }} 
+          directory: oak.wiki
+          repsitory: github.com/oakmound/oak.wiki

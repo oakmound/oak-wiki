@@ -1,0 +1,1 @@
+`oak/key` is a package dedicated to enumerating string representations of keyboard inputs that can be bound in oak events. See [Handling Input](https://github.com/oakmound/oak/wiki/Handling-Input#keyboard-events) for example usage of this package.

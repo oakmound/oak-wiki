@@ -12,6 +12,7 @@ jobs:
           git config --global user.name "Oak Bot"
           git clone https://github.com/oakmound/oak.wiki.git
           cp ./*.md oak.wiki/
+          rm oak.wiki/README.md
           cd oak.wiki
           git add *
           git commit -m "Push from Github Actions"

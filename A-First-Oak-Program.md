@@ -4,7 +4,7 @@ If you haven't installed Go on your machine, see Go's [downloads](https://golang
 
 ### Starting Template
 
-Once you've got go running on your machine, we'll write our first file which will run oak. In this tutorial we'll call this file `core.go`. 
+Once you've got go running on your machine, we'll write our first file which will run oak. In this tutorial we'll call this file `main.go`. 
 
 To start, we'll need a main package with a main function:
 
@@ -15,68 +15,78 @@ func main() {
 }
 ```
 
-If you `go run core.go`, the program will start and immediately exit, because we've not told it to do anything yet.
+If you `go run main.go`, the program will start and immediately exit, because we've not told it to do anything yet.
 
-Oak programs are controlled through scenes, and we'll need an initial scene to run our program. This is done through the `oak.Add` function (or the `oak.AddScene` function). We'll call this scene "game", and `oak.Add` takes the name of the scene as it's first argument:
+Oak programs are controlled through scenes, and we'll need an initial scene to run our program. This is done through the `oak.AddScene` function. We'll call this scene "game", and `oak.AddScene` takes the name of the scene as it's first argument:
 
 ```go
+import (
+    oak "github.com/oakmound/oak/v3"
+)
+
 func main() {
-    oak.Add("game", ...)
+    oak.AddScene("game", ...)
 }
 ```
 
-Scenes are built of three functions: a start or initialization function, a loop, and an end function. These functions have the following required signatures:
+Scenes are built of three functions: a start or initialization function, a loop, and an end function. These functions have the following signatures:
 
 ```go
-type Start func(prevScene string, data interface{})
-type Loop func() bool
-type End func() (string, *scene.Result)
+Start: func(ctx *scene.Context)
+Loop: func() (cont bool)
+End: func() (nextScene string, result *scene.Result)
 ```
 
-`oak.Add` takes these three functions in order, so we'll populate it with a basic template:
+`oak.AddScene` takes these three functions in a struct, but if we don't care about one of them we can leave the function empty:
 
 ```go 
+import (
+    oak "github.com/oakmound/oak/v3"
+    "github.com/oakmound/oak/v3/scene"
+)
+
 func main() {
-    oak.Add("game",
-        func(prevScene string, inData interface{}) {
-        },
-        func() bool {
-            return true
-        },
-        func() (string, *scene.Result) {
-            return "game", nil
-        },
-    )
+    oak.AddScene("game", scene.Scene{})
 }
 ```
 
-In the start function, we take in the previous scene and whatever data was passed to us from the previous scene and create our entities we want to exist in this scene. In this case, we do nothing. 
+This is equivalent to the following:
+
+```go 
+import (
+    oak "github.com/oakmound/oak/v3"
+    "github.com/oakmound/oak/v3/scene"
+)
+
+func main() {
+    oak.AddScene("game", scene.Scene{
+        Start: func(ctx *scene.Context) {},
+        Loop: func() bool { return true },
+        End: func() (string, *scene.Result) {
+            return "game", nil
+        },
+    })
+}
+```
+
+In the start function, we take a context that lets us manipulate our scene and create our entities we want to exist in this scene. In this case, we do nothing. 
 
 In the loop function, we indicate by returning true that this scene will never exit, but will just keep looping. If we return false here, the end function will get called.
 
-In the end function (although it isn't called) we indicate that the next scene that should occur if this scene ends is "game", this same scene, and we give it no information about how this scene ended. `*scene.Result` can be populated with information about how scenes should transition and given data to pass in to the `inData interface{}` field of the next start function, but we don't do either for this template.
+In the end function (although it isn't called) we indicate that the next scene that should occur if this scene ends is "game", this same scene, and we give it no information about how this scene ended. `*scene.Result` can be populated with information about how scenes should transition and given data to pass in to the context of the next start function, but we don't do either for this template.
 
-Just doing this, and calling `go run core.go` will still do nothing, as while oak now has a "game" scene, it hasn't been told to run it. 
+Just doing this, and calling `go run main.go` will still do nothing, as while oak now has a "game" scene, it hasn't been told to run it. 
 
 To run this scene, we add an `oak.Init(scene string)` call to our template:
 
 ```go
 func main() {
-    oak.Add("game",
-        func(prevScene string, inData interface{}) {
-        },
-        func() bool {
-            return true
-        },
-        func() (string, *scene.Result) {
-            return "game", nil
-        },
-    )
+    oak.AddScene("game", scene.Scene{})
     oak.Init("game")
 }
 ```
 
-And now if we run `go run core.go`, we should get this:
+And now if we run `go run main.go`, we should get this:
 
 ![](https://i.imgur.com/XjA8NNk.png)
 
